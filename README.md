@@ -1,4 +1,4 @@
-# Compass - Comparison Of Mass Projects And Student Schoolwork
+# Compass - Comparison Of Multiple Projects And Student Schoolwork
 
 This docker app runs flask and python allowing the user to upload bulk student assignments, in addition to a template (starter) assignment, then scans all student work for likeness. Originally built as a stand alone python script, this repo is an attempt to Dockerize and refine it for ease of use and development.
 
