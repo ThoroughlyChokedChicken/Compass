@@ -48,7 +48,7 @@ def index():
 
     # Var's here are the variables in the template that will be updated
     user = {'username': 'DockerMan'}
-    title = "Buster: Measure of Assignment Similarity"
+    title = "Compass - Comparison Of Multiple Projects And Student Schoolwork"
     CURR_DIR = os.getcwd() # current working directory
     
 
@@ -66,7 +66,7 @@ def index():
 def postUpload():
     global savedID # The unique ID that now has all the uploaded files
 
-    phrase = "SHE WORKED BITCH!!"
+    phrase = "SHE WORKED!!"
 
     CURR_DIR = os.getcwd() # current working directory
     SCAN_DIR = CURR_DIR + '/uploads/' + str(savedID) # location of zipped files
