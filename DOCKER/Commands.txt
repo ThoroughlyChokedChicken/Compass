@@ -1,0 +1,27 @@
+Tutorial: https://pyshark.com/containerize-a-flask-application-using-docker/
+
+All code goes inside src
+
+
+** DOCKER COMMANDS
+
+To BUILD the docker image:
+docker build -t flask-image .
+
+To LIST docker images:
+docker images
+
+To RUN docker image
+docker run -d -p 80:80 flask-image
+
+To VIEW RUNNING IMAGES:
+docker ps
+
+To STOP docker images:
+docker stop DOCKER_ID
+
+To VIEW image running:
+http://localhost:80/ or http://127.0.0.1/
+
+
+
