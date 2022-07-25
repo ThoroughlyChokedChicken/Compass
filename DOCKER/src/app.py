@@ -10,7 +10,10 @@
 from flask import Flask, render_template, request, redirect, url_for, abort, send_from_directory
 from werkzeug.utils import secure_filename
 import os, os.path, random, pathlib
+
 from unzip import UnZipFiles
+from conversion import OcrPdf
+from conversion import WordToTxt
 
 
 ##### NOTES ######
@@ -65,18 +68,33 @@ def index():
 @app.route('/postUpload')
 def postUpload():
     global savedID # The unique ID that now has all the uploaded files
-
+    
     phrase = "SHE WORKED!!"
 
+    # Set the working directory ID for future functions.
     CURR_DIR = os.getcwd() # current working directory
     SCAN_DIR = CURR_DIR + '/uploads/' + str(savedID) # location of zipped files
     
-    # Unzip all files, then check that there were no zipped files inside those zipped files
+    # UNZIP all files, then check that there were no zipped files inside those zipped files
     UnZipFiles(SCAN_DIR) # unzip all files
+
+    # Create a TXT directory for all converted TXT files
+    TXT_DIR = SCAN_DIR + '/txt' 
+    os.mkdir(TXT_DIR)
+
+    # OCR all PDF's
+    OcrPdf(SCAN_DIR, TXT_DIR) # covert PDF's to txt
+
+    # WORD DOC CONVERSION
+    WordToTxt(SCAN_DIR, TXT_DIR)
 
     #TODO: START HERE!!!! YOU NOW HAVE ALL FILES UPLOADED!!
     # That could have taken some time, so how do we update the user that action is happening??
     # Then scan for #'s of file extensions
+
+
+
+
 
     return render_template('postupload.html', intro = phrase, ID = savedID)
 
@@ -132,8 +150,6 @@ def upload_files():
             logFile.write("\n")
 
 
-    #if filename != '':
-    #    uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
     
     
 

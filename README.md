@@ -7,8 +7,10 @@ This docker app runs flask and python allowing the user to upload bulk student a
 - Upload template assignment *(Completed)*
 - Recursively unzip all files *(Completed)*
 - Generate randomized alphanumeric session sequence *(Partially Completed)*
-- OCR all PDF's
-- Convert docx files to txt
+- OCR all PDF's *(Completed)*
+- Convert docx files to txt *(Completed)*
+- Collect and list all files and file types (doc, docx, pdf, py, cs, etc)
+- Structure location for results output (all files in this folder will be cross compared -> txt files, naming convention, etc)
 - Direct file compare
 - Collect results for ease of display
 - Display results

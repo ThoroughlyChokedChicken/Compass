@@ -24,10 +24,6 @@ def UnZipFiles(SCANNING_DIR):
     logFile.write("First scan and unzip complete.\n")
 
     
-    
-    ## TODO: START CHECK HERE. SOMETHING IS OFF WITH THE SCANNER
-
-    ######## NEXT 3 COMMENTED OUT TO FIND WHY IT'S LOGGING WEIRD
     listOfKnownZips = zipFilesToUnzip # What we know is present
     logFile.write("Initalizing second scan...\n")
     logFile.close()
@@ -42,9 +38,10 @@ def UnZipFiles(SCANNING_DIR):
             break
         else:
             logFile = open(logFileLocation, "a")
-            logFile.write("Further zip files found!!\n")
+            logFile.write("Further zip files found!\n")
             
             # TODO: Currenty this reunzips everything. If needed for performance, isolate only the new zip files and only unzip those
+
             listOfKnownZips = zipFilesToUnzip
             logFile.write("Scanning for further zip files.\n")
             logFile.close()
@@ -55,8 +52,6 @@ def UnZipFiles(SCANNING_DIR):
             logFile.close()
             PerformUnZip(SCANNING_DIR, zipFilesToUnzip) # Actually Unzip
 
-    
-    ## BETWEEN TODO AND HERE
 
     logFile = open(logFileLocation, "a")
     logFile.write("** UNZIPPING COMPLETED **\n\n")
