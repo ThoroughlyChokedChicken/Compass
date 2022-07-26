@@ -9,8 +9,6 @@ def CheckFileExtensions(SCANNING_DIR):
     
     fileExtensionsDict = {}
 
-    CURR_DIR = os.getcwd() # current working directory
-
     for root, dirs, files in os.walk(SCANNING_DIR):
         # select file name
         for file in files:
@@ -36,9 +34,9 @@ def CheckFileExtensions(SCANNING_DIR):
     if DEBUG_STATUS == True:
         logFileLocation = SCANNING_DIR + "/log.log"
         logFile = open(logFileLocation, "a")
-        logFile.write("Ending Dict\n")
+        logFile.write("** FILE EXTENSIONS FOUND: **\n")
         logFile.write(str(fileExtensionsDict))
-        logFile.write("\n")
+        logFile.write("\n\n")
         logFile.close()
 
     return fileExtensionsDict

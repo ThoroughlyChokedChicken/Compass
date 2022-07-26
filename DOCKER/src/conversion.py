@@ -77,7 +77,7 @@ def WordToTxt(SCANNING_DIR, TEXTDIR):
                         print(text, file=text_file)
 
     
-    logFile.write("** COMPELTED WORD DOC CONVERSION **\n")
+    logFile.write("** COMPELTED WORD DOC CONVERSION **\n\n")
     logFile.close()
         
         
@@ -131,7 +131,7 @@ def OcrPdf(SCANNING_DIR, TEXTDIR):
     
     # Completed OCR
     logFile = open(logFileLocation, "a")
-    logFile.write("** COMPLETED OCR'ING PDF FILES **\n")
+    logFile.write("** COMPLETED OCR'ING PDF FILES **\n\n")
     logFile.close()
 
 
