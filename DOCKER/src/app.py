@@ -9,11 +9,13 @@
 
 from flask import Flask, render_template, request, redirect, url_for, abort, send_from_directory
 from werkzeug.utils import secure_filename
-import os, os.path, random, pathlib
+import os, os.path, random, pathlib, string
+
 
 from unzip import UnZipFiles
 from conversion import OcrPdf
 from conversion import WordToTxt
+from analyse import CheckFileExtensions
 
 
 ##### NOTES ######
@@ -30,8 +32,8 @@ app = Flask(__name__)
 app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
 
 # Global Variables
-uniqueID = 0
-savedID = 0
+uniqueID = "0"
+savedID = "0"
 
 
 
@@ -44,7 +46,14 @@ def index():
     # TODO: HOW DO YOU REMEMBER THE CURRENT UNIQUE ID WHEN RELOADING A PAGE?? OR PASSING IT ON??
     global uniqueID 
     
-    uniqueID = random.randint(1,10000)
+    # OLD UNIQUE ID
+    #uniqueID = random.randint(1,10000)
+
+    # NEW UNIQUE ID
+    
+    uniqueID = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+
+
     # TODO: read all folder names in uploads and make sure the uniqueID is not a match for one that already exists there
     os.mkdir('uploads/' + str(uniqueID))
     app.config['UPLOAD_PATH'] = 'uploads/' + str(uniqueID)
@@ -82,20 +91,27 @@ def postUpload():
     TXT_DIR = SCAN_DIR + '/txt' 
     os.mkdir(TXT_DIR)
 
+    # Collect all file extensions in a dictonary
+    fileExtensionsDict = CheckFileExtensions(SCAN_DIR)
+
+    # TODO: Create a folder to copy all files to be scanned into
+    # IE, create a folder and dump all assignments to be compared into there
+    # includes only txt (doc/docx/pdf) or code (py/cs/gd/gdns/vs) files 
+    # if text/word doc, in the results GIVE NOTES to check for imagine files if they were detected in the zip (.png/.jpg/.jpeg/etc)
+    # TODO: Also note location of starter assignment
+
     # OCR all PDF's
-    OcrPdf(SCAN_DIR, TXT_DIR) # covert PDF's to txt
+    OcrPdf(SCAN_DIR, TXT_DIR) #need to cleanup output location
 
     # WORD DOC CONVERSION
-    WordToTxt(SCAN_DIR, TXT_DIR)
+    WordToTxt(SCAN_DIR, TXT_DIR) #need to cleanup output location
 
-    #TODO: START HERE!!!! YOU NOW HAVE ALL FILES UPLOADED!!
+
+    # TODO: Display "ready" screen to user OR load up some sort of status page
     # That could have taken some time, so how do we update the user that action is happening??
-    # Then scan for #'s of file extensions
 
-
-
-
-
+    # TODO: Show results
+    
     return render_template('postupload.html', intro = phrase, ID = savedID)
 
 

@@ -3,13 +3,13 @@
 This docker app runs flask and python allowing the user to upload bulk student assignments, in addition to a template (starter) assignment, then scans all student work for likeness. Originally built as a stand alone python script, this repo is an attempt to Dockerize and refine it for ease of use and development.
 
 ## Roadmap
-- Bulk upload files *(Completed)*
-- Upload template assignment *(Completed)*
-- Recursively unzip all files *(Completed)*
-- Generate randomized alphanumeric session sequence *(Partially Completed)*
-- OCR all PDF's *(Completed)*
-- Convert docx files to txt *(Completed)*
-- Collect and list all files and file types (doc, docx, pdf, py, cs, etc)
+- ~~Bulk upload files~~ *(Completed)*
+- ~~Upload template assignment~~ *(Completed)*
+- ~~Recursively unzip all files~~ *(Completed)*
+- ~~Generate randomized alphanumeric session sequence~~ *(Completed)*
+- ~~OCR all PDF's~~ *(Completed)*
+- ~~Convert docx files to txt~~ *(Completed)*
+- ~~Collect and list all files and file types~~ (doc, docx, pdf, py, cs, etc) *(Completed)*
 - Structure location for results output (all files in this folder will be cross compared -> txt files, naming convention, etc)
 - Direct file compare
 - Collect results for ease of display

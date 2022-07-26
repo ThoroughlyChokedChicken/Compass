@@ -70,17 +70,13 @@ def WordToTxt(SCANNING_DIR, TEXTDIR):
                     text = docx2txt.process(fileWithLocation)
                     
                     # TODO: UPDATE OUTPUT LOCATION
-                    
+
+                    # output file location
                     newFileName = SCANNING_DIR + "/" + file + ".txt" 
                     with open(newFileName, "w") as text_file:
                         print(text, file=text_file)
 
-
-    logFile.write("Docx files have been converted to txt in prep for scanning.\n")
     
-
-    #if ORIGINAL_ASSIGNMENT_NAME[-5:] == ".docx":
-    #    ORIGINAL_ASSIGNMENT_NAME = ORIGINAL_ASSIGNMENT_NAME + ".py" # TODO: modded from .txt to .py for MOSS testing
     logFile.write("** COMPELTED WORD DOC CONVERSION **\n")
     logFile.close()
         
