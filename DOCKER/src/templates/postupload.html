@@ -8,5 +8,12 @@
       <p>
         You kept your unique ID of {{ ID }}
       </p>
+      <p>
+        Found a total of {{ total }} files. Here are all the files we're going to analyse:<br><br>
+      
+      {% for file in fileList %}
+      <b>FILE: </b>{{ file }}<br><br>
+      {% endfor %}
+    </p>
   </body>
 </html>

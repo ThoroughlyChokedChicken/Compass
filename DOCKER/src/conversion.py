@@ -33,19 +33,43 @@ DEBUG_STATUS = True # extra records in the log files
 # in terminal to convert a PDF to formatted text file try:
 # pdftotext -layout INPUT.pdf OUTPUT.txt
 
-def ConvertTemplateAssignment():
-    pass
-    # TODO: config call this if template assignment is a PDF
+def ConvertStarterAssignment(SESSION_DIR):
+    logFileLocation = SESSION_DIR + "/log.log"
+    logFile = open(logFileLocation, "a")
+    logFile.write("** CONVERT TEMPLATE FILE **\n")
 
+    dir_list = os.listdir(SESSION_DIR)
+    
+    for file in dir_list:
+        logFile.write(str(file) + "\n")
+        if file.endswith(".docx") or file.endswith(".doc"):
+            logFile.write("FOUND word file: " + str(file) + "\n")
+            fileWithLocation = SESSION_DIR + "/" + file
+            text = docx2txt.process(fileWithLocation)
+            # output file location (same as original doc but with .txt appended)
+            newFileName = fileWithLocation + ".txt" 
+            with open(newFileName, "w") as text_file:
+                print(text, file=text_file)
+
+        elif file.endswith(".pdf"):
+            logFile.write("FOUND PDF file: " + str(file) + "\n")
+            pdfFileToConvert = SESSION_DIR + "/" + file
+            txtFileOutput = "\"" + pdfFileToConvert + ".txt" + "\""
+            # Command sequence that needs to be run by os.system
+            stringForSubprocess = "pdftotext -layout \"" + pdfFileToConvert + "\" " + txtFileOutput
+            os.system(stringForSubprocess) # Run the python command
+
+    logFile.write("\n** CONVERT TEMPLATE FILE COMPLETE **\n\n")
+    logFile.close()
 
 
 ### CONVERT ALL WORD DOC'S TO TXT ###
-def WordToTxt(SCANNING_DIR, TEXTDIR):
+def WordToTxt(SCANNING_DIR, SESSION_DIR, listOfFilesToScan):
 
     global DEBUG_STATUS
 
     # Log to file
-    logFileLocation = SCANNING_DIR + "/log.log"
+    logFileLocation = SESSION_DIR + "/log.log"
     logFile = open(logFileLocation, "a")
     logFile.write("** BEGIN WORD DOC CONVERSION **\n")
     
@@ -60,8 +84,6 @@ def WordToTxt(SCANNING_DIR, TEXTDIR):
                     logFile.write(file)
                 
                 if file[0] != "~":
-
-                    #fileWithLocation = SCANNING_DIR + "/" + file
                     fileWithLocation = str(os.path.join(root, file))
 
                     if DEBUG_STATUS == True:
@@ -69,16 +91,24 @@ def WordToTxt(SCANNING_DIR, TEXTDIR):
                     
                     text = docx2txt.process(fileWithLocation)
                     
-                    # TODO: UPDATE OUTPUT LOCATION
+                    # output file location (same as original doc but with .txt appended)
+                    newFileName = fileWithLocation + ".txt" 
+                    
+                    # Add txt version of file to list of files to scan
+                    if str(file) != "starter_assignment.doc" or str(file) != "starter_assignment.docx":
+                        listOfFilesToScan.append(str(newFileName))
 
-                    # output file location
-                    newFileName = SCANNING_DIR + "/" + file + ".txt" 
                     with open(newFileName, "w") as text_file:
                         print(text, file=text_file)
 
     
+
+
+    
     logFile.write("** COMPELTED WORD DOC CONVERSION **\n\n")
     logFile.close()
+
+    return listOfFilesToScan
         
         
 
@@ -89,11 +119,11 @@ def WordToTxt(SCANNING_DIR, TEXTDIR):
 
 ### OCR ALL PDF's ###
 
-def OcrPdf(SCANNING_DIR, TEXTDIR):
+def OcrPdf(SCANNING_DIR, SESSION_DIR, listOfFilesToScan):
 
     global DEBUG_STATUS
 
-    logFileLocation = SCANNING_DIR + "/log.log"
+    logFileLocation = SESSION_DIR + "/log.log"
     logFile = open(logFileLocation, "a")
     logFile.write("** BEGIN OCR'ING PDF FILES **\n")
     logFile.close()
@@ -111,15 +141,21 @@ def OcrPdf(SCANNING_DIR, TEXTDIR):
                 
                 pdfFileToConvert = str(os.path.join(root, file))
                 
-                txtFileOutput = "\"" + TEXTDIR + "/output" + str(counter + 1) + ".txt" + "\""
-                #print("txtFileOutput: " + txtFileOutput + "\n")
+                #txtFileOutput = "\"" + TEXTDIR + "/output" + str(counter + 1) + ".txt" + "\""
+                txtFileOutput = "\"" + pdfFileToConvert + ".txt" + "\""
+
+                # Add OCR'ed Text File Location to List
+                listAddition = pdfFileToConvert + ".txt"
+                if str(file) != "starter_assignment.pdf":
+                    listOfFilesToScan.append(str(listAddition))
+
 
                 # Command sequence that needs to be run by os.system
                 stringForSubprocess = "pdftotext -layout \"" + pdfFileToConvert + "\" " + txtFileOutput
               
                 # If debugging, log every attempted command
                 if DEBUG_STATUS == True:
-                    logFileLocation = SCANNING_DIR + "/log.log"
+                    logFileLocation = SESSION_DIR + "/log.log"
                     logFile = open(logFileLocation, "a")
                     logFile.write(stringForSubprocess + "\n")
                     logFile.close()
@@ -134,4 +170,5 @@ def OcrPdf(SCANNING_DIR, TEXTDIR):
     logFile.write("** COMPLETED OCR'ING PDF FILES **\n\n")
     logFile.close()
 
+    return listOfFilesToScan
 

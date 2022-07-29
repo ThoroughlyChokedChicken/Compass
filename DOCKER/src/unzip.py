@@ -4,11 +4,11 @@ import sys, os, os.path, zipfile # Needed to unzip files
 DEBUG_STATUS = False # extra records in the log files
 
 
-def UnZipFiles(SCANNING_DIR):
+def UnZipFiles(SCANNING_DIR, SESSION_DIR):
     
     global DEBUG_STATUS
 
-    logFileLocation = SCANNING_DIR + "/log.log"
+    logFileLocation = SESSION_DIR + "/log.log"
     logFile = open(logFileLocation, "a")
     logFile.write("\n** UNZIPPING FILES STARTED **\n")
     logFile.close()
@@ -16,10 +16,10 @@ def UnZipFiles(SCANNING_DIR):
   
     zipFilesToUnzip = [] # will house fill file path of all zip files to unzip
     
-    zipFilesToUnzip = ScanForZipFiles(SCANNING_DIR, zipFilesToUnzip) # 1st Scan
-    PerformUnZip(SCANNING_DIR, zipFilesToUnzip) # Actually Unzip
+    zipFilesToUnzip = ScanForZipFiles(SCANNING_DIR, SESSION_DIR, zipFilesToUnzip) # 1st Scan
+    PerformUnZip(SCANNING_DIR, SESSION_DIR, zipFilesToUnzip) # Actually Unzip
 
-    logFileLocation = SCANNING_DIR + "/log.log"
+    logFileLocation = SESSION_DIR + "/log.log"
     logFile = open(logFileLocation, "a")
     logFile.write("First scan and unzip complete.\n")
 
@@ -27,7 +27,7 @@ def UnZipFiles(SCANNING_DIR):
     listOfKnownZips = zipFilesToUnzip # What we know is present
     logFile.write("Initalizing second scan...\n")
     logFile.close()
-    zipFilesToUnzip = ScanForZipFiles(SCANNING_DIR, zipFilesToUnzip) # 2nd Scan of ALL zips present
+    zipFilesToUnzip = ScanForZipFiles(SCANNING_DIR, SESSION_DIR, zipFilesToUnzip) # 2nd Scan of ALL zips present
 
     # Loops to catch zip files inside other zip files
     while(True):
@@ -67,10 +67,10 @@ def UnZipFiles(SCANNING_DIR):
 
 
 
-def ScanForZipFiles(SCANNING_DIR, knownZipFiles):
+def ScanForZipFiles(SCANNING_DIR, SESSION_DIR, knownZipFiles):
     global DEBUG_STATUS
 
-    logFileLocation = SCANNING_DIR + "/log.log"
+    logFileLocation = SESSION_DIR + "/log.log"
     logFile = open(logFileLocation, "a")
     logFile.write("Beginning Scan of Files\n")
     
@@ -104,11 +104,11 @@ def ScanForZipFiles(SCANNING_DIR, knownZipFiles):
 
 
 
-def PerformUnZip(SCANNING_DIR, zipFilesToUnzip):
+def PerformUnZip(SCANNING_DIR, SESSION_DIR, zipFilesToUnzip):
     
     global DEBUG_STATUS
 
-    logFileLocation = SCANNING_DIR + "/log.log"
+    logFileLocation = SESSION_DIR + "/log.log"
     logFile = open(logFileLocation, "a")
     logFile.write("Beginning unzip of files\n")
     
