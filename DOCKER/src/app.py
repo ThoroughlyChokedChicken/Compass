@@ -7,7 +7,20 @@
 # Uploading files
 # https://blog.miguelgrinberg.com/post/handling-file-uploads-with-flask
 
+### Terminal Commands
+# Remove old images
+# docker image prune
+
+# Build the latest code into a docker image called "flask-image"
+# docker build -t flask-image .
+
+# Create and run a new container from the "flask-image" image
+# docker run -d -p 80:80 flask-image
+#
+
+
 from flask import Flask, render_template, request, redirect, url_for, abort, send_from_directory
+
 from werkzeug.utils import secure_filename
 import os, os.path, random, pathlib, string
 
@@ -19,6 +32,10 @@ from conversion import ConvertStarterAssignment
 from analyse import FilesToScan
 from analyse import CheckFileExtensions
 from buster import StarterAssignment
+from buster import ScanExactLineCopies
+from buster import MatchingOutput
+from results import Result
+
 
 
 
@@ -36,6 +53,14 @@ app = Flask(__name__)
 #app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
 
 # Global Variables
+
+# DELTA Description
+# The percentage of similariry between both files (ie, A is 95% match to B but B is only a 35% match to A.)
+# This could occur when A only has 2 paragraphs and they are identical to B (hence the 95% match)
+# However B wrote several more paragraphs, so they are only 35% matching B
+# TODO: Take into account if there's a template that matches first. Then account for the num of of matching LINES (ie, if only 4 matching lines then throw out/reduce the priority of the hit)
+DELTA_BETWEEN_TWO_FILES = 20 
+
 DEBUG_STATUS = True
 uniqueID = "0"
 savedID = "0"
@@ -61,7 +86,7 @@ def index():
     app.config['UPLOAD_PATH'] = 'uploads/' + str(uniqueID)
 
     # Var's here are the variables in the template that will be updated
-    user = {'username': 'DockerMan'}
+    user = {'username': 'Usename'}
     title = "Compass - Comparison Of Multiple Projects And Student Schoolwork"
     CURR_DIR = os.getcwd() # current working directory
     
@@ -82,6 +107,7 @@ def postUpload():
     global USE_ONLY_APPROVED_EXTENSIONS
     global APPROVED_EXTENSIONS
     global DEBUG_STATUS
+    global DELTA_BETWEEN_TWO_FILES
 
     listOfFilesToScan = [] # Contains list of a txt and code files to scan
     
@@ -128,6 +154,7 @@ def postUpload():
         logFile.close()
 
 
+
     ###### START HERE:
     # We now have list of all files in list form (listOfFilesToScan) and written to file
     # Also have the inital assignment file stripped of whitespace and each line in a list
@@ -139,7 +166,13 @@ def postUpload():
     # That could have taken some time, so how do we update the user that action is happening??
     # Look up some flask progress pages
 
+    LIST_OF_POSITIVE_HITS = ScanExactLineCopies(originalAssignmentLinesNoWhitespace, listOfFilesToScan, templatePresent, SESSION_DIR) 
 
+    resultsList = MatchingOutput(LIST_OF_POSITIVE_HITS, DELTA_BETWEEN_TWO_FILES, originalAssignmentLinesNoWhitespace)
+
+    
+    # TODO: SORT BY HIGHEST PERCENT
+    sortedResultsList = sorted(resultsList, key=lambda result: result.highestPercent, reverse=True)
 
 
 
@@ -163,7 +196,7 @@ def postUpload():
         simpleList.append(newItem)
         totalFiles += 1
     
-    return render_template('postupload.html', intro = phrase, ID = savedID, fileList = simpleList, total = totalFiles)
+    return render_template('postupload.html', intro = phrase, ID = savedID, fileList = simpleList, total = totalFiles, results = sortedResultsList)
 
 
 

@@ -15,5 +15,25 @@
       <b>FILE: </b>{{ file }}<br><br>
       {% endfor %}
     </p>
+    <h1>*********************************</h1>
+    <p>
+      {% for result in results %}
+      <b>RESULT: {{ result.highestPercent }}% similarity between both files.</b><br>
+      <i>{{ result.matchingLinesBetweenAssignments }} matching lines out of {{ result.totalLines }} possible.</i><br><br>
+      File 1: {{  result.fileOne  }}<br>
+      File 2: {{  result.fileTwo  }}<br>
+
+      <br>Additional Info<br>
+      {{ result.percentOne }}% / {{ result.percentTwo }}% % similarity % between both files with a {{ result.matchingLinesBetweenAssignments }} matching lines out of {{ result.totalLines }} possible. <br>
+      Delta: {{  result.delta  }}<br>
+      Lines In File 1: {{  result.linesOfWorkOne  }}<br>
+      Lines In File 2: {{  result.linesOfWorkTwo  }}<br>
+      Difference in Total Overall Lines Between Each Assignment: {{  result.differenceInTotalLines  }}<br>
+      Lines Matching Template Assignment: {{  result.matchingOriginalLines  }}<br>
+      
+      You can link them here too!<br><br>
+      {% endfor %}
+
+    </p>
   </body>
 </html>
