@@ -66,12 +66,12 @@ uniqueID = "0"
 savedID = "0"
 USE_ONLY_APPROVED_EXTENSIONS = True # make true if you want to limit file extensions for scanning
 APPROVED_EXTENSIONS = [".txt", ".rtf", ".cs", ".py", ".gdscript"] # DON'T ADD DOC OR PDF TO THIS!!
+ORIGINAL_UPLOADED_FILES = [] # These are all the original files uploaded
+COMPLETE_FILE_LIST = [] # After unzipping, this is every file present
 
 
 
-
-
-
+############################## MAIN LOADED PAGE ##############################
 @app.route('/')
 def index():
     
@@ -80,6 +80,9 @@ def index():
     # CREATE UNIQUE ID
     uniqueID = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
 
+    # Ensure uploads folder exists
+    if os.path.isdir('uploads') == False:
+        os.mkdir('uploads')
 
     # TODO: read all folder names in uploads and make sure the uniqueID is not a match for one that already exists there
     os.mkdir('uploads/' + str(uniqueID))
@@ -100,18 +103,18 @@ def index():
 
 
 
-
+############################## UPLOADED PAGE ##############################
 @app.route('/postUpload')
-def postUpload():
+def postFileUpload():
     global savedID # The unique ID that now has all the uploaded files
     global USE_ONLY_APPROVED_EXTENSIONS
     global APPROVED_EXTENSIONS
     global DEBUG_STATUS
     global DELTA_BETWEEN_TWO_FILES
+    global ORIGINAL_UPLOADED_FILES
+    global COMPLETE_FILE_LIST
 
     listOfFilesToScan = [] # Contains list of a txt and code files to scan
-    
-    phrase = "Files Successfully Uploaded."
 
     # Set the working directory ID for future functions.
     CURR_DIR = os.getcwd() # current working directory
@@ -119,7 +122,7 @@ def postUpload():
     UPLOAD_DIR = SESSION_DIR + "/assignment_uploads/"
     
     # UNZIP all files, then check that there were no zipped files inside those zipped files
-    UnZipFiles(UPLOAD_DIR, SESSION_DIR) # unzip all files
+    COMPLETE_FILE_LIST = UnZipFiles(UPLOAD_DIR, SESSION_DIR) # unzip all files
 
     # Collect all file extensions in a dictonary (do this before converting word/pdf)
     fileExtensionsDict = CheckFileExtensions(SESSION_DIR, UPLOAD_DIR, uniqueID, USE_ONLY_APPROVED_EXTENSIONS, APPROVED_EXTENSIONS)
@@ -133,12 +136,16 @@ def postUpload():
     # WORD DOC CONVERSION
     listOfFilesToScan = WordToTxt(UPLOAD_DIR, SESSION_DIR, listOfFilesToScan) #need to cleanup output location
 
-
-
-    
     # SETUP TEMPLATE ASSIGNMENT IF NEEDED
     templatePresent, originalAssignmentLinesNoWhitespace = StarterAssignment(SESSION_DIR, UPLOAD_DIR)
+
     
+
+
+
+
+
+
     # COMPLETE LIST OF ALL FILES TO SCAN
     # Currently has word and pdf files only.
     # Add all .rtf and .txt files (if they aren't already in the list)
@@ -155,6 +162,8 @@ def postUpload():
 
 
 
+
+    
     ###### START HERE:
     # We now have list of all files in list form (listOfFilesToScan) and written to file
     # Also have the inital assignment file stripped of whitespace and each line in a list
@@ -192,11 +201,68 @@ def postUpload():
     totalFiles = 0
     for each in listOfFilesToScan:
         itemToAdd = each.lstrip(UPLOAD_DIR)
-        newItem = itemToAdd.rstrip(".txt")
+        #newItem = itemToAdd.rstrip(".txt")
+        newItem = itemToAdd.removesuffix(".txt")
         simpleList.append(newItem)
         totalFiles += 1
     
-    return render_template('postupload.html', intro = phrase, ID = savedID, fileList = simpleList, total = totalFiles, results = sortedResultsList)
+    # Number of original Files
+    numFiles = len(ORIGINAL_UPLOADED_FILES)
+
+    
+
+
+
+
+
+    ############ TRYING TO ISOLATE FILES THAT ARE NOT COMPARED
+
+    #COMPLETE_FILE_LIST - has all the files total
+    #simpleList - has the list of files the program is going to scan
+    
+    excludedFileList = []
+    includedFileList = [] 
+    includedShortFileList = []
+    #COMPLETE_FILE_LIST has only file names, not any path of the path
+
+    # Look at ALL files after unzipping and check to see if they are going to be analysized
+    for fileNameOnly in COMPLETE_FILE_LIST:
+        for filenameSimpleList in simpleList:
+            if fileNameOnly in filenameSimpleList:
+                includedFileList.append(filenameSimpleList)
+    
+    # Now includedFileList is a list of the files that we are going to analyse
+
+    # Now make a list of the excluded files
+    for fileNameOnly in COMPLETE_FILE_LIST:
+        for includedFileName in includedFileList:
+            if fileNameOnly in includedFileName:
+                includedShortFileList.append(fileNameOnly)
+    
+
+    # Finally find the diff's between includedShortFileList and Complete list
+    for each in COMPLETE_FILE_LIST:
+        if each in includedShortFileList:
+            pass # nothing, we're using this file
+        else:
+            if each.endswith(".zip"):
+                pass # don't count the zip files
+            else:
+                excludedFileList.append(each)
+
+
+
+    
+
+
+
+
+        
+
+    # Title on the top of the page
+    phrase = "Files Successfully Uploaded."
+
+    return render_template('postupload.html', intro = phrase, ID = savedID, fileList = simpleList, total = totalFiles, results = sortedResultsList, numFiles = numFiles, originalFileList = ORIGINAL_UPLOADED_FILES, excludedList = excludedFileList)
 
 
 
@@ -208,6 +274,7 @@ def postUpload():
 def upload_files():
     global uniqueID
     global savedID
+    global ORIGINAL_UPLOADED_FILES
 
     savedID = uniqueID
 
@@ -217,7 +284,8 @@ def upload_files():
     logFile.write("** UPLOADING FILES **\n")
     
 
-    #### THIS COLLECTS THE STARTER ASSIGNMENT FILE ####
+    ########### THIS COLLECTS THE STARTER ASSIGNMENT FILE ###########
+
     uploaded_file = request.files.get('baseAssignment') #var is of type 'FileStorage'
     ogfilename = uploaded_file.filename
     ogfilenamesecure = secure_filename(uploaded_file.filename)
@@ -238,14 +306,17 @@ def upload_files():
         logStarterFile.write("NO STARTER FILE")
     
     logStarterFile.close()
-
+    
+    ########### END STARTER ASSIGNMENT FILE COLLECTION ###########
     
 
 
-    #### THIS COLLECTS ALL STUDENT ASSIGNMENT FILES TO BE SCANNED ####
+    ########### THIS COLLECTS ALL STUDENT ASSIGNMENT FILES TO BE SCANNED ###########
+
     # Create upload folder if it doesn't exist
     UPLOAD_DIR = "uploads/" + str(savedID) + '/assignment_uploads' 
-    os.mkdir(UPLOAD_DIR)
+    if os.path.isdir(UPLOAD_DIR) == False:
+        os.mkdir(UPLOAD_DIR)
 
     # Set upload path for assignment files
     app.config["UPLOAD_PATH"] = UPLOAD_DIR
@@ -261,17 +332,25 @@ def upload_files():
             
 
         #if uploaded_file.filename != '' and uploaded_file.filename != ogfilename:
+
         if uploaded_file.filename != '':
             uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], uploaded_file.filename))
             logFile.write("Uploaded: ")
             logFile.write(uploaded_file.filename)
             logFile.write("\n")
+            ORIGINAL_UPLOADED_FILES.append(uploaded_file.filename)
      
     # Upload Completed
     logFile.write("** UPLOADING COMPLETED **\n")
     logFile.close()
 
-    return redirect(url_for('postUpload'))
+
+    ######## NOW HEAD TO postUpload METHOD above
+    return redirect(url_for('postFileUpload'))
+
+
+
+
 
 
 

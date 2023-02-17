@@ -30,12 +30,12 @@ COPY requirements.txt .
 # Poppler from build
 # https://stackoverflow.com/questions/61272431/installing-poppler-utils-of-version-0-82-in-docker/63265495#63265495
 RUN apt-get update && apt-get install apt-utils wget build-essential cmake libfreetype6-dev pkg-config libfontconfig-dev libjpeg-dev libopenjp2-7-dev libcairo2-dev libtiff5-dev -y
-RUN wget https://poppler.freedesktop.org/poppler-data-0.4.10.tar.gz \
+RUN wget https://poppler.freedesktop.org/poppler-data-0.4.10.tar.gz --no-check-certificate\
     && tar -xf poppler-data-0.4.10.tar.gz \
     && cd poppler-data-0.4.10 \
     && make install \
     && cd .. \
-    && wget https://poppler.freedesktop.org/poppler-21.03.0.tar.xz \
+    && wget https://poppler.freedesktop.org/poppler-21.03.0.tar.xz --no-check-certificate\
     && tar -xf poppler-21.03.0.tar.xz \
     && cd poppler-21.03.0 \
     && mkdir build \

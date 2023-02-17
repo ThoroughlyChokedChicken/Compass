@@ -57,6 +57,15 @@ def UnZipFiles(SCANNING_DIR, SESSION_DIR):
     logFile.write("** UNZIPPING COMPLETED **\n\n")
     logFile.close()
 
+    #### LOG ALL FILES
+    COMPLETE_FILE_LIST = []
+    for root, dirs, files in os.walk(SCANNING_DIR):
+    # select file name
+        for file in files:
+            COMPLETE_FILE_LIST.append(file)
+
+    return COMPLETE_FILE_LIST
+
 
 
 

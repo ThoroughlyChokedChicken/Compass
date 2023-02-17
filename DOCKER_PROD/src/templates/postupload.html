@@ -9,7 +9,21 @@
         You kept your unique ID of {{ ID }}
       </p>
       <p>
-        Found a total of {{ total }} files. Here are all the files we're going to analyse:<br><br>
+        You selected {{ numFiles }} to upload. Here are the names of the original files to upload:<br>
+        {% for file in originalFileList %}
+        <b>FILE: </b>{{ file }}<br>
+        {% endfor %}
+      </p>
+      
+      <p>
+        Here are the file names found in the excludedFileList list. They are the files we're not going to look at. Zip files are removed: <br>
+        {% for file in excludedList %}
+        <b>FILE: </b>{{ file }}<br>
+        {% endfor %}
+      </p>
+      
+      <p>
+        Found a total of {{ total }} files. Here are all the files we're going to ACTUALLY analyse:<br><br>
       
       {% for file in fileList %}
       <b>FILE: </b>{{ file }}<br><br>
